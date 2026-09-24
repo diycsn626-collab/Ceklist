@@ -83,7 +83,7 @@ export default function App() {
   const splitDocs=(value:string)=>value.split(/;|\n|\.(?=\s+[A-Z])/).map(x=>x.trim()).filter(Boolean)
   const sopDocumentProgress=(sop:typeof CHECKLIST[number])=>{
     let total=0, fulfilled=0
-    sop.criteria.forEach(c=>{const docs=splitDocs(c.documents||'');total+=docs.length;const response=audit?.responses[c.id];docs.forEach((_,i)=>{if(response?.documentResults?.[String(i)]==='compliant')fulfilled++})})
+    sop.criteria.forEach(c=>{const docs=splitDocs(c.documents||'');total+=docs.length;const response=audit?.responses[c.id];docs.forEach((_,i)=>{if(response?.documentResults?.[String(i)])fulfilled++})})
     return {total,fulfilled,percent:total?Math.round(fulfilled/total*100):0}
   }
 
