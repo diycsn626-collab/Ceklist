@@ -134,12 +134,9 @@ export default function App() {
             {activeSop.criteria.map(c=>{
               const r=audit.responses[c.id]??emptyResponse(), open=!!expanded[c.id], ev=evidence.filter(x=>x.criterionId===c.id)
               return <div className="criterion" key={c.id} id={c.id}>
-                <button className="criterion-head" onClick={()=>setExpanded(x=>({...x,[c.id]:!open}))}>
-                  <span className="letter">{c.letter}</span><span><b>{c.title}</b><small>{r.result==='compliant'?'✓ Ada / Sesuai':r.result==='nonconformity'?'✕ Tidak Sesuai':r.result==='na'?'N/A':'Belum diisi'}</small></span><strong>{open?'⌃':'⌄'}</strong>
-                </button>
-                {open&&<div className="criterion-body">
+                <div className="criterion-body">
                   <div className="info"><b>Kriteria Audit</b><p>{c.criteria}</p></div>
-                  <div className="info docs"><b>Dokumen yang diperiksa</b><p>{c.documents||'-'}</p></div>
+                  <div className="info docs"><b>Dokumen yang diperiksa</b>{splitDocs(c.documents||'').length?<ol>{splitDocs(c.documents||'').map((doc,i)=><li key={i}>{doc}</li>)}</ol>:<p>-</p>}</div>
                   <div className="status-row">
                     {([['compliant','Ada / Sesuai'],['nonconformity','Tidak Ada / Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={r.result===v?'selected':''} onClick={()=>setResponse(c.id,{result:r.result===v?'':v})}>{l}</button>)}
                   </div>
@@ -149,7 +146,7 @@ export default function App() {
                     <label className="upload">+ Tambah Foto<input hidden type="file" accept="image/*" multiple onChange={e=>addEvidence(c.id,e.target.files)}/></label>
                     <div className="evidence-list">{ev.map(x=><div key={x.id}><button onClick={()=>openEvidence(x)}>{x.name}</button><button className="danger" onClick={()=>removeEvidence(x)}>×</button></div>)}</div>
                   </div>
-                </div>}
+                </div>
               </div>
             })}
           </article>}
