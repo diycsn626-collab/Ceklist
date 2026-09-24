@@ -80,6 +80,7 @@ export default function App() {
   const sops=useMemo(()=>CHECKLIST.filter(s=>(!audit||audit.scope==='All'||s.department===audit.scope)&&(!query||(`${s.code} ${s.name}`).toLowerCase().includes(query.toLowerCase()))),[audit,query])
   const stats=audit?auditProgress(audit):null
   const activeSop=sops.find(s=>s.code===selectedSop)||sops[0]
+  const splitDocs=(value:string)=>value.split(/;|\n|\.(?=\s+[A-Z])/).map(x=>x.trim()).filter(Boolean)
 
   return <div className="app">
     <header>
