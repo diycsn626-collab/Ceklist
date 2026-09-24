@@ -23,6 +23,7 @@ export default function App() {
   const [title,setTitle]=useState('')
   const [scope,setScope]=useState<AuditRecord['scope']>('All')
   const [query,setQuery]=useState('')
+  const [view,setView]=useState<'dashboard'|'audits'>('dashboard')
 
   const audit=audits.find(a=>a.id===selected)
   const load=async()=>{
@@ -41,7 +42,7 @@ export default function App() {
   const create=async()=>{
     if(!title.trim()) return alert('Judul audit wajib diisi.')
     const a=newAudit(title.trim(),scope)
-    await db.audits.add(a); setAudits(v=>[a,...v]); setSelected(a.id); setTitle(''); setShowNew(false)
+    await db.audits.add(a); setAudits(v=>[a,...v]); setSelected(a.id); setTitle(''); setShowNew(false); setView('audits')
   }
   const remove=async(a:AuditRecord)=>{
     if(!confirm(`Hapus audit "${a.title}"?`)) return
@@ -84,17 +85,38 @@ export default function App() {
     </header>
 
     <main>
-      <aside>
+      <aside className="sidebar">
+        <nav className="side-nav">
+          <button className={view==='dashboard'?'nav-active':''} onClick={()=>setView('dashboard')}>▦ <span>Dashboard</span></button>
+          <button className={view==='audits'?'nav-active':''} onClick={()=>setView('audits')}>✓ <span>Audit</span></button>
+          <button onClick={()=>setView('audits')}>☷ <span>Checklist</span></button>
+          <button onClick={()=>setView('audits')}>! <span>Temuan</span></button>
+          <button onClick={()=>setView('audits')}>▣ <span>Evidence</span></button>
+          <button onClick={()=>audit&&exportAuditCsv(audit)}>↗ <span>Report</span></button>
+        </nav>
+        <div className="audit-list">
         <h3>Daftar Audit</h3>
         {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
         {audits.map(a=><div key={a.id} className={`audit-card ${a.id===selected?'active':''}`} onClick={()=>setSelected(a.id)}>
           <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
           <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
         </div>)}
+        </div>
       </aside>
 
       <section className="content">
-        {!audit?<div className="empty"><h1>Checklist Audit BKSI</h1><p>Pilih audit atau buat audit baru.</p><button className="primary" onClick={()=>setShowNew(true)}>Buat Audit</button></div>:<>
+        {view==='dashboard'?<div className="dashboard">
+          <div className="dash-title"><div><small>OVERVIEW</small><h1>Compliance Dashboard</h1><p>Monitoring pelaksanaan audit Engineering & HSE BKSI.</p></div><button className="primary" onClick={()=>setShowNew(true)}>+ Audit Baru</button></div>
+          <div className="dash-summary">
+            <div><span>Total Audit</span><b>{audits.length}</b><small>Audit tersimpan</small></div>
+            <div><span>Audit Aktif</span><b>{audits.filter(a=>auditProgress(a).percent<100).length}</b><small>Belum 100% terisi</small></div>
+            <div><span>Temuan</span><b>{audits.reduce((n,a)=>n+auditProgress(a).nonconformity,0)}</b><small>Tidak sesuai</small></div>
+          </div>
+          <h2 className="section-title">Compliance progress</h2>
+          <div className="progress-grid">
+            {audits.length?audits.map(a=>{const p=auditProgress(a);return <button className="progress-card" key={a.id} onClick={()=>{setSelected(a.id);setView('audits')}}><div><span>{a.scope}</span><strong>›</strong></div><h2>{a.title}</h2><b>{p.percent}%</b><div className="bar"><i style={{width:p.percent+'%'}}/></div><small>{p.answered} controls complete <em>{p.total} total</em></small></button>}):<div className="dash-empty">Belum ada audit. Klik <b>Audit Baru</b> untuk mulai.</div>}
+          </div>
+        </div>:!audit?<div className="empty"><h1>Checklist Audit BKSI</h1><p>Pilih audit atau buat audit baru.</p><button className="primary" onClick={()=>setShowNew(true)}>Buat Audit</button></div>:<>
           <div className="hero">
             <div><span className="badge">{audit.scope}</span><input className="title-input" value={audit.title} onChange={e=>setField('title',e.target.value)}/></div>
             <button onClick={()=>exportAuditCsv(audit)}>Export CSV</button>
@@ -135,6 +157,7 @@ export default function App() {
             })}
           </article>)}
         </>}
+        }
       </section>
     </main>
 
