@@ -36,3 +36,5 @@ header{background:#fff}
 .sop-tree{display:block}.criterion-menu{margin:2px 0 7px 12px;padding-left:9px;border-left:1px solid #ffffff24;display:flex;flex-direction:column;gap:2px}
 .criterion-menu button{display:grid!important;grid-template-columns:25px 1fr!important;align-items:center;gap:7px!important;padding:7px 8px!important;color:#b9c5be!important}
 .criterion-menu button:hover{background:#3a4a43!important;color:#fff!important}.criterion-menu i{font-style:normal;width:23px;height:23px;border-radius:6px;background:#ffffff12;display:grid;place-items:center;font-size:11px;font-weight:800}.criterion-menu span{font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.criterion-head.static{cursor:default}.docs ol{margin:10px 0 0 20px;padding:0}.docs li{padding:4px 0 4px 4px;line-height:1.45}.docs li+li{border-top:1px solid #0000000b}
