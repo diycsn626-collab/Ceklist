@@ -38,3 +38,5 @@ header{background:#fff}
 .criterion-menu button:hover{background:#3a4a43!important;color:#fff!important}.criterion-menu i{font-style:normal;width:23px;height:23px;border-radius:6px;background:#ffffff12;display:grid;place-items:center;font-size:11px;font-weight:800}.criterion-menu span{font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .criterion-head.static{cursor:default}.docs ol{margin:10px 0 0 20px;padding:0}.docs li{padding:4px 0 4px 4px;line-height:1.45}.docs li+li{border-top:1px solid #0000000b}
+
+.doc-checklist{list-style-position:outside}.doc-checklist>li{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:14px;align-items:center;padding:10px 0}.doc-status{display:flex;gap:6px}.doc-status button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:7px 10px;font-size:12px;white-space:nowrap}.doc-status button.selected{background:var(--green);border-color:var(--green);color:#fff}@media(max-width:700px){.doc-checklist>li{grid-template-columns:1fr}.doc-status{display:grid;grid-template-columns:repeat(3,1fr)}.doc-status button{padding:8px 5px}}
