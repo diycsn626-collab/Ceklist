@@ -26,6 +26,7 @@ export default function App() {
   const [view,setView]=useState<'dashboard'|'audits'>('dashboard')
   const [selectedSop,setSelectedSop]=useState<string>('')
   const [sidebarOpen,setSidebarOpen]=useState<Record<string,boolean>>({})
+  const [mobileChecklistOpen,setMobileChecklistOpen]=useState(false)
 
   const audit=audits.find(a=>a.id===selected)
   const load=async()=>{
@@ -104,7 +105,7 @@ export default function App() {
     </header>
 
     <main>
-      <aside className="sidebar">
+      <aside className={'sidebar '+(mobileChecklistOpen?'mobile-open':'')}>
         <div className="audit-list">
           <h3>Daftar Audit</h3>
           {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
@@ -112,7 +113,7 @@ export default function App() {
             <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
             <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
           </div>)}
-          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><div className="sop-tree" key={item.code}><button className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setSidebarOpen(x=>({...x,[item.code]:!x[item.code]}));setView('audits')}}><b>{item.code}</b><span>{item.name}</span>{(()=>{const dp=sopDocumentProgress(item);return <small className="sop-progress"><span>{sidebarOpen[item.code]?'⌃':'⌄'} {dp.fulfilled}/{dp.total} dokumen</span><strong>{dp.percent}%</strong><i><em style={{width:dp.percent+'%'}}/></i></small>})()}</button>{sidebarOpen[item.code]&&<div className="criterion-menu">{item.criteria.map(c=><button key={c.id} onClick={()=>{setSelectedSop(item.code);setView('audits');setExpanded(x=>({...x,[c.id]:true}));setTimeout(()=>document.getElementById(c.id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}}><i>{c.letter}</i><span>{c.title}</span></button>)}</div>}</div>)}</div></div>}
+          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><div className="sop-tree" key={item.code}><button className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setSidebarOpen(x=>({...x,[item.code]:!x[item.code]}));setView('audits')}}><b>{item.code}</b><span>{item.name}</span>{(()=>{const dp=sopDocumentProgress(item);return <small className="sop-progress"><span>{sidebarOpen[item.code]?'⌃':'⌄'} {dp.fulfilled}/{dp.total} dokumen</span><strong>{dp.percent}%</strong><i><em style={{width:dp.percent+'%'}}/></i></small>})()}</button>{sidebarOpen[item.code]&&<div className="criterion-menu">{item.criteria.map(c=><button key={c.id} onClick={()=>{setSelectedSop(item.code);setView('audits');setExpanded(x=>({...x,[c.id]:true}));setMobileChecklistOpen(false);setTimeout(()=>document.getElementById(c.id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}}><i>{c.letter}</i><span>{c.title}</span></button>)}</div>}</div>)}</div></div>}
         </div>
       </aside>
 
