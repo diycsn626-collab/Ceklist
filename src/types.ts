@@ -22,6 +22,7 @@ export interface AuditResponse {
   pic: string
   notes: string
   documentResults?: Record<string, ResultStatus>
+  documentAttachments?: Record<string, Array<{id:string; name:string; type:string; dataUrl:string}>>
   additionalDocuments?: string[]
 }
 
