@@ -81,6 +81,16 @@ export default function App() {
   const stats=audit?auditProgress(audit):null
   const activeSop=sops.find(s=>s.code===selectedSop)||sops[0]
   const splitDocs=(value:string)=>value.split(/;|\n|\.(?=\s+[A-Z])/).map(x=>x.trim()).filter(Boolean)
+  const addDocumentAttachment=(criterionId:string,key:string,file?:File)=>{
+    if(!file) return
+    if(file.size>8*1024*1024){alert('Maksimal 8 MB per file');return}
+    const reader=new FileReader()
+    reader.onload=()=>{const r=audit?.responses[criterionId]||emptyResponse();const current=r.documentAttachments?.[key]||[];setResponse(criterionId,{documentAttachments:{...(r.documentAttachments||{}),[key]:[...current,{id:crypto.randomUUID(),name:file.name,type:file.type,dataUrl:String(reader.result)}]}})}
+    reader.readAsDataURL(file)
+  }
+  const removeDocumentAttachment=(criterionId:string,key:string,id:string)=>{
+    const r=audit?.responses[criterionId]||emptyResponse();setResponse(criterionId,{documentAttachments:{...(r.documentAttachments||{}),[key]:(r.documentAttachments?.[key]||[]).filter(x=>x.id!==id)}})
+  }
   const sopDocumentProgress=(sop:typeof CHECKLIST[number])=>{
     let total=0, fulfilled=0
     sop.criteria.forEach(c=>{const docs=splitDocs(c.documents||'');total+=docs.length;const response=audit?.responses[c.id];docs.forEach((_,i)=>{if(response?.documentResults?.[String(i)])fulfilled++})})
@@ -141,7 +151,7 @@ export default function App() {
               return <div className="criterion" key={c.id} id={c.id}>
                 <div className="criterion-body">
                   <div className="info"><b>Kriteria Audit</b><p>{c.criteria}</p></div>
-                  <div className="info docs"><b>Dokumen yang diperiksa</b>{splitDocs(c.documents||'').length?<ol className="doc-checklist">{splitDocs(c.documents||'').map((doc,i)=>{const key=String(i),status=r.documentResults?.[key]||'';return <li key={key}><span>{doc}</span><div className="doc-status">{([['compliant','Sesuai'],['nonconformity','Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={status===v?'selected':''} onClick={()=>setResponse(c.id,{documentResults:{...(r.documentResults||{}),[key]:status===v?'':v}})}>{l}</button>)}</div></li>})}</ol>:<p>-</p>}</div>
+                  <div className="info docs"><b>Dokumen yang diperiksa</b>{splitDocs(c.documents||'').length?<ol className="doc-checklist">{splitDocs(c.documents||'').map((doc,i)=>{const key=String(i),status=r.documentResults?.[key]||'';return <li key={key}><div className="doc-item"><span>{doc}</span><div className="doc-attachments">{(r.documentAttachments?.[key]||[]).map(f=><span className="attachment-chip" key={f.id}>{f.type.startsWith('image/')?<a href={f.dataUrl} target="_blank" rel="noreferrer">🖼 {f.name}</a>:<a href={f.dataUrl} download={f.name}>📎 {f.name}</a>}<button onClick={()=>removeDocumentAttachment(c.id,key,f.id)}>×</button></span>)}<label className="attach-btn">+ Dokumen/Gambar<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={e=>{addDocumentAttachment(c.id,key,e.target.files?.[0]);e.currentTarget.value=''}} /></label></div></div><div className="doc-status">{([['compliant','Sesuai'],['nonconformity','Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={status===v?'selected':''} onClick={()=>setResponse(c.id,{documentResults:{...(r.documentResults||{}),[key]:status===v?'':v}})}>{l}</button>)}</div></li>})}</ol>:<p>-</p>}</div>
                   <label>Temuan / Keterangan<textarea value={r.finding} onChange={e=>setResponse(c.id,{finding:e.target.value})}/></label>
                   <div className="two"><label>PIC<input value={r.pic} onChange={e=>setResponse(c.id,{pic:e.target.value})}/></label><label>Catatan<input value={r.notes} onChange={e=>setResponse(c.id,{notes:e.target.value})}/></label></div>
                   <div className="evidence"><b>Evidence Foto ({ev.length}/{MAX_FILES})</b>
