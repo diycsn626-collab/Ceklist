@@ -22,6 +22,7 @@ export interface AuditResponse {
   pic: string
   notes: string
   documentResults?: Record<string, ResultStatus>
+  additionalDocuments?: string[]
 }
 
 export interface AuditRecord {
