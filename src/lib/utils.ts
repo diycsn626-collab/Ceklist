@@ -19,18 +19,22 @@ export function getCriterionTitle(criteria: string, fallback: string) {
 
 export function auditProgress(audit: AuditRecord) {
   const included = CHECKLIST.filter(s => audit.scope === 'All' || s.department === audit.scope)
-  const ids = included.flatMap(s => s.criteria.map(c => c.id))
-  const answered = ids.filter(id => audit.responses[id]?.result).length
-  const compliant = ids.filter(id => audit.responses[id]?.result === 'compliant').length
-  const nonconformity = ids.filter(id => audit.responses[id]?.result === 'nonconformity').length
-  const na = ids.filter(id => audit.responses[id]?.result === 'na').length
+  let total = 0, answered = 0, compliant = 0, nonconformity = 0, na = 0
+  for (const sop of included) for (const criterion of sop.criteria) {
+    const docs = criterion.documents.split(/;|\n|\.(?=\s+[A-Z])/).map(x => x.trim()).filter(Boolean)
+    const response = audit.responses[criterion.id]
+    total += docs.length
+    docs.forEach((_, i) => {
+      const status = response?.documentResults?.[String(i)]
+      if (status) answered++
+      if (status === 'compliant') compliant++
+      if (status === 'nonconformity') nonconformity++
+      if (status === 'na') na++
+    })
+  }
   return {
-    total: ids.length,
-    answered,
-    compliant,
-    nonconformity,
-    na,
-    percent: ids.length ? Math.round(answered / ids.length * 100) : 0,
+    total, answered, compliant, nonconformity, na,
+    percent: total ? Math.round(answered / total * 100) : 0,
     conformity: (compliant + nonconformity) ? Math.round(compliant / (compliant + nonconformity) * 100) : 0
   }
 }
