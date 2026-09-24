@@ -136,10 +136,7 @@ export default function App() {
               return <div className="criterion" key={c.id} id={c.id}>
                 <div className="criterion-body">
                   <div className="info"><b>Kriteria Audit</b><p>{c.criteria}</p></div>
-                  <div className="info docs"><b>Dokumen yang diperiksa</b>{splitDocs(c.documents||'').length?<ol>{splitDocs(c.documents||'').map((doc,i)=><li key={i}>{doc}</li>)}</ol>:<p>-</p>}</div>
-                  <div className="status-row">
-                    {([['compliant','Ada / Sesuai'],['nonconformity','Tidak Ada / Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={r.result===v?'selected':''} onClick={()=>setResponse(c.id,{result:r.result===v?'':v})}>{l}</button>)}
-                  </div>
+                  <div className="info docs"><b>Dokumen yang diperiksa</b>{splitDocs(c.documents||'').length?<ol className="doc-checklist">{splitDocs(c.documents||'').map((doc,i)=>{const key=String(i),status=r.documentResults?.[key]||'';return <li key={key}><span>{doc}</span><div className="doc-status">{([['compliant','Sesuai'],['nonconformity','Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={status===v?'selected':''} onClick={()=>setResponse(c.id,{documentResults:{...(r.documentResults||{}),[key]:status===v?'':v}})}>{l}</button>)}</div></li>})}</ol>:<p>-</p>}</div>
                   <label>Temuan / Keterangan<textarea value={r.finding} onChange={e=>setResponse(c.id,{finding:e.target.value})}/></label>
                   <div className="two"><label>PIC<input value={r.pic} onChange={e=>setResponse(c.id,{pic:e.target.value})}/></label><label>Catatan<input value={r.notes} onChange={e=>setResponse(c.id,{notes:e.target.value})}/></label></div>
                   <div className="evidence"><b>Evidence Foto ({ev.length}/{MAX_FILES})</b>
