@@ -79,7 +79,7 @@ export default function App() {
 
   return <div className="app">
     <header>
-      <div className="brand"><img src={`${import.meta.env.BASE_URL}logo-bksi.svg`}/><div><b>BKSI AUDIT</b><small>Engineering & HSE Compliance</small></div></div>
+      <div className="brand"><img src={`${import.meta.env.BASE_URL}BKSI%20Logo%203.png`} alt="Batu Karang Saham Investasi"/><div><b>BKSI AUDIT</b><small>Engineering & HSE Compliance</small></div></div>
       <button className="primary" onClick={()=>setShowNew(true)}>+ Audit Baru</button>
     </header>
 
