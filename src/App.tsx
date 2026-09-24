@@ -88,14 +88,6 @@ export default function App() {
 
     <main>
       <aside className="sidebar">
-        <nav className="side-nav">
-          <button className={view==='dashboard'?'nav-active':''} onClick={()=>setView('dashboard')}>▦ <span>Dashboard</span></button>
-          <button className={view==='audits'?'nav-active':''} onClick={()=>setView('audits')}>✓ <span>Audit</span></button>
-          <button onClick={()=>setView('audits')}>☷ <span>Checklist</span></button>
-          <button onClick={()=>setView('audits')}>! <span>Temuan</span></button>
-          <button onClick={()=>setView('audits')}>▣ <span>Evidence</span></button>
-          <button onClick={()=>audit&&exportAuditCsv(audit)}>↗ <span>Report</span></button>
-        </nav>
         <div className="audit-list">
           <h3>Daftar Audit</h3>
           {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
