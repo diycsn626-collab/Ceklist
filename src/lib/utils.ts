@@ -1,7 +1,9 @@
-import checklist from '../data/checklist.json'
+import checklist1 from '../data/checklist-1.json'
+import checklist2 from '../data/checklist-2.json'
+import checklist3 from '../data/checklist-3.json'
 import type { AuditRecord, AuditResponse, ChecklistSop } from '../types'
 
-export const CHECKLIST = checklist as ChecklistSop[]
+export const CHECKLIST = [...checklist1, ...checklist2, ...checklist3] as ChecklistSop[]
 export const ALL_CRITERIA = CHECKLIST.flatMap(s => s.criteria)
 
 export const emptyResponse = (): AuditResponse => ({ result: '', finding: '', pic: '', notes: '' })
