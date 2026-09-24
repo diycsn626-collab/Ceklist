@@ -81,6 +81,11 @@ export default function App() {
   const stats=audit?auditProgress(audit):null
   const activeSop=sops.find(s=>s.code===selectedSop)||sops[0]
   const splitDocs=(value:string)=>value.split(/;|\n|\.(?=\s+[A-Z])/).map(x=>x.trim()).filter(Boolean)
+  const sopDocumentProgress=(sop:typeof CHECKLIST[number])=>{
+    let total=0, fulfilled=0
+    sop.criteria.forEach(c=>{const docs=splitDocs(c.documents||'');total+=docs.length;const response=audit?.responses[c.id];docs.forEach((_,i)=>{if(response?.documentResults?.[String(i)]==='compliant')fulfilled++})})
+    return {total,fulfilled,percent:total?Math.round(fulfilled/total*100):0}
+  }
 
   return <div className="app">
     <header>
@@ -97,7 +102,7 @@ export default function App() {
             <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
             <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
           </div>)}
-          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><div className="sop-tree" key={item.code}><button className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setSidebarOpen(x=>({...x,[item.code]:!x[item.code]}));setView('audits')}}><b>{item.code}</b><span>{item.name}</span><small>{sidebarOpen[item.code]?'⌃':'⌄'} {item.criteria.length} poin</small></button>{sidebarOpen[item.code]&&<div className="criterion-menu">{item.criteria.map(c=><button key={c.id} onClick={()=>{setSelectedSop(item.code);setView('audits');setExpanded(x=>({...x,[c.id]:true}));setTimeout(()=>document.getElementById(c.id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}}><i>{c.letter}</i><span>{c.title}</span></button>)}</div>}</div>)}</div></div>}
+          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><div className="sop-tree" key={item.code}><button className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setSidebarOpen(x=>({...x,[item.code]:!x[item.code]}));setView('audits')}}><b>{item.code}</b><span>{item.name}</span>{(()=>{const dp=sopDocumentProgress(item);return <small className="sop-progress"><span>{sidebarOpen[item.code]?'⌃':'⌄'} {dp.fulfilled}/{dp.total} dokumen</span><strong>{dp.percent}%</strong><i><em style={{width:dp.percent+'%'}}/></i></small>})()}</button>{sidebarOpen[item.code]&&<div className="criterion-menu">{item.criteria.map(c=><button key={c.id} onClick={()=>{setSelectedSop(item.code);setView('audits');setExpanded(x=>({...x,[c.id]:true}));setTimeout(()=>document.getElementById(c.id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}}><i>{c.letter}</i><span>{c.title}</span></button>)}</div>}</div>)}</div></div>}
         </div>
       </aside>
 
