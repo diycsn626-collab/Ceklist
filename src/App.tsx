@@ -24,6 +24,7 @@ export default function App() {
   const [scope,setScope]=useState<AuditRecord['scope']>('All')
   const [query,setQuery]=useState('')
   const [view,setView]=useState<'dashboard'|'audits'>('dashboard')
+  const [selectedSop,setSelectedSop]=useState<string>('')
 
   const audit=audits.find(a=>a.id===selected)
   const load=async()=>{
@@ -77,6 +78,7 @@ export default function App() {
 
   const sops=useMemo(()=>CHECKLIST.filter(s=>(!audit||audit.scope==='All'||s.department===audit.scope)&&(!query||(`${s.code} ${s.name}`).toLowerCase().includes(query.toLowerCase()))),[audit,query])
   const stats=audit?auditProgress(audit):null
+  const activeSop=sops.find(s=>s.code===selectedSop)||sops[0]
 
   return <div className="app">
     <header>
@@ -95,12 +97,12 @@ export default function App() {
           <button onClick={()=>audit&&exportAuditCsv(audit)}>↗ <span>Report</span></button>
         </nav>
         <div className="audit-list">
-        <h3>Daftar Audit</h3>
+        {view==='audits'&&audit?<><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(s=><button key={s.code} className={(activeSop?.code===s.code)?'sop-menu-active':''} onClick={()=>setSelectedSop(s.code)}><b>{s.code}</b><span>{s.name}</span><small>{s.criteria.length} poin</small></button>)}</div></>:<><h3>Daftar Audit</h3>
         {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
         {audits.map(a=><div key={a.id} className={`audit-card ${a.id===selected?'active':''}`} onClick={()=>setSelected(a.id)}>
           <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
           <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
-        </div>)}
+        </div>)}</>}
         </div>
       </aside>
 
@@ -132,9 +134,9 @@ export default function App() {
             <div><b>{stats.compliant}</b><span>Sesuai</span></div><div><b>{stats.nonconformity}</b><span>Tidak Sesuai</span></div>
           </div>}
           <input className="search" placeholder="Cari SOP..." value={query} onChange={e=>setQuery(e.target.value)}/>
-          {sops.map(sop=><article className="sop" key={sop.code}>
-            <div className="sop-head"><div><span>{sop.department}</span><b>{sop.code}</b></div><h3>{sop.name}</h3></div>
-            {sop.criteria.map(c=>{
+          {activeSop&&<article className="sop" key={activeSop.code}>
+            <div className="sop-head"><div><span>{activeSop.department}</span><b>{activeSop.code}</b></div><h3>{activeSop.name}</h3></div>
+            {activeSop.criteria.map(c=>{
               const r=audit.responses[c.id]??emptyResponse(), open=!!expanded[c.id], ev=evidence.filter(x=>x.criterionId===c.id)
               return <div className="criterion" key={c.id}>
                 <button className="criterion-head" onClick={()=>setExpanded(x=>({...x,[c.id]:!open}))}>
@@ -155,7 +157,7 @@ export default function App() {
                 </div>}
               </div>
             })}
-          </article>)}
+          </article>}
         </>}
         }
       </section>
