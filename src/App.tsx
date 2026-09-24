@@ -25,6 +25,7 @@ export default function App() {
   const [query,setQuery]=useState('')
   const [view,setView]=useState<'dashboard'|'audits'>('dashboard')
   const [selectedSop,setSelectedSop]=useState<string>('')
+  const [sidebarOpen,setSidebarOpen]=useState<Record<string,boolean>>({})
 
   const audit=audits.find(a=>a.id===selected)
   const load=async()=>{
@@ -95,7 +96,7 @@ export default function App() {
             <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
             <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
           </div>)}
-          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><button key={item.code} className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setView('audits')}}><b>{item.code}</b><span>{item.name}</span><small>{item.criteria.length} poin</small></button>)}</div></div>}
+          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><div className="sop-tree" key={item.code}><button className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setSidebarOpen(x=>({...x,[item.code]:!x[item.code]}));setView('audits')}}><b>{item.code}</b><span>{item.name}</span><small>{sidebarOpen[item.code]?'⌃':'⌄'} {item.criteria.length} poin</small></button>{sidebarOpen[item.code]&&<div className="criterion-menu">{item.criteria.map(c=><button key={c.id} onClick={()=>{setSelectedSop(item.code);setView('audits');setExpanded(x=>({...x,[c.id]:true}));setTimeout(()=>document.getElementById(c.id)?.scrollIntoView({behavior:'smooth',block:'center'}),80)}}><i>{c.letter}</i><span>{c.title}</span></button>)}</div>}</div>)}</div></div>}
         </div>
       </aside>
 
@@ -131,7 +132,7 @@ export default function App() {
             <div className="sop-head"><div><span>{activeSop.department}</span><b>{activeSop.code}</b></div><h3>{activeSop.name}</h3></div>
             {activeSop.criteria.map(c=>{
               const r=audit.responses[c.id]??emptyResponse(), open=!!expanded[c.id], ev=evidence.filter(x=>x.criterionId===c.id)
-              return <div className="criterion" key={c.id}>
+              return <div className="criterion" key={c.id} id={c.id}>
                 <button className="criterion-head" onClick={()=>setExpanded(x=>({...x,[c.id]:!open}))}>
                   <span className="letter">{c.letter}</span><span><b>{c.title}</b><small>{r.result==='compliant'?'✓ Ada / Sesuai':r.result==='nonconformity'?'✕ Tidak Sesuai':r.result==='na'?'N/A':'Belum diisi'}</small></span><strong>{open?'⌃':'⌄'}</strong>
                 </button>
