@@ -141,7 +141,7 @@ export default function App() {
                   <div className="info"><b>Kriteria Audit</b><p>{c.criteria}</p></div>
                   <div className="info docs"><b>Dokumen yang diperiksa</b><p>{c.documents||'-'}</p></div>
                   <div className="status-row">
-                    {([['compliant','Ada / Sesuai'],['nonconformity','Tidak Ada / Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button className={r.result===v?'selected':''} onClick={()=>setResponse(c.id,{result:v})}>{l}</button>)}
+                    {([['compliant','Ada / Sesuai'],['nonconformity','Tidak Ada / Tidak Sesuai'],['na','N/A']] as const).map(([v,l])=><button key={v} className={r.result===v?'selected':''} onClick={()=>setResponse(c.id,{result:r.result===v?'':v})}>{l}</button>)}
                   </div>
                   <label>Temuan / Keterangan<textarea value={r.finding} onChange={e=>setResponse(c.id,{finding:e.target.value})}/></label>
                   <div className="two"><label>PIC<input value={r.pic} onChange={e=>setResponse(c.id,{pic:e.target.value})}/></label><label>Catatan<input value={r.notes} onChange={e=>setResponse(c.id,{notes:e.target.value})}/></label></div>
