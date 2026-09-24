@@ -97,12 +97,13 @@ export default function App() {
           <button onClick={()=>audit&&exportAuditCsv(audit)}>↗ <span>Report</span></button>
         </nav>
         <div className="audit-list">
-        {view==='audits'&&audit?<><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(s=><button key={s.code} className={(activeSop?.code===s.code)?'sop-menu-active':''} onClick={()=>setSelectedSop(s.code)}><b>{s.code}</b><span>{s.name}</span><small>{s.criteria.length} poin</small></button>)}</div></>:<><h3>Daftar Audit</h3>
-        {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
-        {audits.map(a=><div key={a.id} className={`audit-card ${a.id===selected?'active':''}`} onClick={()=>setSelected(a.id)}>
-          <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
-          <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
-        </div>)}</>}
+          <h3>Daftar Audit</h3>
+          {audits.length===0&&<p className="muted">Belum ada audit. Buat audit baru untuk mulai.</p>}
+          {audits.map(a=><div key={a.id} className={`audit-card ${a.id===selected?'active':''}`} onClick={()=>{setSelected(a.id);setView('audits')}}>
+            <b>{a.title}</b><small>{a.auditDate} · {a.scope}</small>
+            <div className="card-actions"><span>{auditProgress(a).percent}%</span><button onClick={e=>{e.stopPropagation();remove(a)}}>Hapus</button></div>
+          </div>)}
+          {audit&&<div className="sidebar-sop"><h3>SOP Checklist</h3><div className="sop-menu">{sops.map(item=><button key={item.code} className={(activeSop?.code===item.code)?'sop-menu-active':''} onClick={()=>{setSelectedSop(item.code);setView('audits')}}><b>{item.code}</b><span>{item.name}</span><small>{item.criteria.length} poin</small></button>)}</div></div>}
         </div>
       </aside>
 
